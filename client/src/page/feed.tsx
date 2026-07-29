@@ -290,17 +290,21 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
                       const iframe = e.target as HTMLIFrameElement;
                       const win = iframe.contentWindow;
                       if (!win) return;
-                      const resize = () => {
+                      const resize = (tag: string) => {
                         // Reset height before measuring: scrollHeight on the root element
                         // is max(viewport height, content height), so measuring while the
                         // iframe still has a tall height feeds back into ever-growing values.
                         iframe.style.height = '0px';
-                        iframe.style.height = win.document.documentElement.scrollHeight + 'px';
+                        const sh = win.document.documentElement.scrollHeight;
+                        console.log('[iframe-resize]', tag, 'scrollHeight=', sh, 'clientWidth=', win.document.documentElement.clientWidth);
+                        iframe.style.height = sh + 'px';
                       };
                       // Measuring synchronously on load can catch layout mid-reflow
                       // (e.g. before an @import'd webfont swaps in); defer past paint.
-                      requestAnimationFrame(() => requestAnimationFrame(resize));
-                      win.document.fonts?.ready.then(resize);
+                      resize('onLoad-sync');
+                      requestAnimationFrame(() => requestAnimationFrame(() => resize('raf-raf')));
+                      win.document.fonts?.ready.then(() => resize('fonts-ready'));
+                      setTimeout(() => resize('timeout-1s'), 1000);
                     }}
                   />
                 ) : (
