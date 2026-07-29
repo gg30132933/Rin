@@ -110,23 +110,25 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
     ref.current = id;
   }, [id]);
   useEffect(() => {
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: "default",
-    });
-    mermaid.run({
-      suppressErrors: true,
-      nodes: document.querySelectorAll("pre.mermaid_default")
-    }).then(() => {
+    import("mermaid").then(({ default: mermaid }) => {
       mermaid.initialize({
         startOnLoad: false,
-        theme: "dark",
+        theme: "default",
       });
       mermaid.run({
         suppressErrors: true,
-        nodes: document.querySelectorAll("pre.mermaid_dark")
+        nodes: document.querySelectorAll("pre.mermaid_default")
+      }).then(() => {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: "dark",
+        });
+        mermaid.run({
+          suppressErrors: true,
+          nodes: document.querySelectorAll("pre.mermaid_dark")
+        });
       });
-    })
+    });
   }, [feed]);
 
   return (
