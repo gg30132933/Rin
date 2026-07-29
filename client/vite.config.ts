@@ -19,8 +19,8 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       react(),
-      // Only open visualizer in build mode
-      visualizer({ open: !isDev })
+      // Only open visualizer in local build mode; opening a browser crashes headless CI builds (e.g. Cloudflare Workers Builds)
+      visualizer({ open: !isDev && !process.env.CI })
     ],
     server: {
       proxy: {
