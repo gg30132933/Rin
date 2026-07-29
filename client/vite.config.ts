@@ -22,12 +22,8 @@ export default defineConfig(({ mode }) => {
       // terser runs in-process and avoids that failure mode
       minify: 'terser',
       rollupOptions: {
-        output: {
-          // unbounded parallel chunk-file writes hang/die silently in Cloudflare's build sandbox; serialize them
-          experimentalMinChunkSize: undefined,
-        },
-        // Rollup docs: throttles concurrent file reads/writes during bundle generation; low values avoid
-        // resource-exhaustion hangs in constrained CI sandboxes (e.g. Cloudflare Workers Builds)
+        // throttles concurrent chunk file reads/writes during bundle generation; unbounded parallelism
+        // hangs/dies silently in Cloudflare's build sandbox, matching where these builds have died
         maxParallelFileOps: 2,
       },
     },
