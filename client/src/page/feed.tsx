@@ -288,13 +288,19 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
                     style={{ minHeight: '800px' }}
                     onLoad={(e) => {
                       const iframe = e.target as HTMLIFrameElement;
-                      if (iframe.contentWindow) {
+                      const win = iframe.contentWindow;
+                      if (!win) return;
+                      const resize = () => {
                         // Reset height before measuring: scrollHeight on the root element
                         // is max(viewport height, content height), so measuring while the
                         // iframe still has a tall height feeds back into ever-growing values.
                         iframe.style.height = '0px';
-                        iframe.style.height = iframe.contentWindow.document.documentElement.scrollHeight + 'px';
-                      }
+                        iframe.style.height = win.document.documentElement.scrollHeight + 'px';
+                      };
+                      // Measuring synchronously on load can catch layout mid-reflow
+                      // (e.g. before an @import'd webfont swaps in); defer past paint.
+                      requestAnimationFrame(() => requestAnimationFrame(resize));
+                      win.document.fonts?.ready.then(resize);
                     }}
                   />
                 ) : (
