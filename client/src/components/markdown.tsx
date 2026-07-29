@@ -398,7 +398,7 @@ export function Markdown({ content }: { content: string }) {
             props.className = `${props.className || ""} mt-8`.trim();
           }
           const modifiedChildren = React.Children.map(children, (child) => {
-            if (isValidElement(child) && child.props.node.tagName === "ol") {
+            if (isValidElement(child) && child.props.node?.tagName === "ol") {
               return cloneElement(child, {
                 ...child.props,
                 className: "list-decimal px-10 text-sm text-[#6B7280]",

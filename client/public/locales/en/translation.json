@@ -724,5 +724,7 @@
   "sort_latest": "Latest",
   "sort_popular": "Popular",
   "total_tags": "Total {{count}} tags",
+  "related_posts": "Related Posts",
+  "no_related_posts": "No related posts available.",
   "anonymous": "Anonymous"
 }

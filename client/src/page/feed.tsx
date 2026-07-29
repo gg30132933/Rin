@@ -280,7 +280,22 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
                     ) : null}
                   </div>
                 )}
-                <Markdown content={feed.content} />
+                {feed.content.trim().toLowerCase().startsWith("<!doctype") || feed.content.trim().toLowerCase().startsWith("<html") ? (
+                  <iframe
+                    title={feed.title ?? "Feed Content"}
+                    srcDoc={feed.content}
+                    className="w-full border-none bg-white rounded-xl"
+                    style={{ minHeight: '800px' }}
+                    onLoad={(e) => {
+                      const iframe = e.target as HTMLIFrameElement;
+                      if (iframe.contentWindow) {
+                        iframe.style.height = iframe.contentWindow.document.documentElement.scrollHeight + 'px';
+                      }
+                    }}
+                  />
+                ) : (
+                  <Markdown content={feed.content} />
+                )}
                 <div className="mt-6 flex flex-col gap-2">
                   {feed.hashtags.length > 0 && (
                     <div className="flex flex-row flex-wrap gap-x-2">
@@ -302,7 +317,7 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
                   </div>
                 </div>
               </article>
-              <AdjacentSection id={id} setError={setError} />
+              <AdjacentSection id={id} />
               {feed && <Comments id={`${feed.id}`} />}
               <div className="h-16" />
             </main>

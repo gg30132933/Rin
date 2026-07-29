@@ -724,5 +724,7 @@
   "sort_latest": "最新",
   "sort_popular": "热门",
   "total_tags": "共 {{count}} 个标签",
+  "related_posts": "相关文章",
+  "no_related_posts": "目前没有相关文章。",
   "anonymous": "匿名"
 }

@@ -17,6 +17,11 @@ interface MarkdownEditorProps {
   height?: string;
 }
 
+// Matches structural/formatting tags found in real rich-text HTML (webpages, Word,
+// Google Docs) but absent from Monaco's own syntax-highlighted copy (plain spans/divs),
+// so internal copy-paste and plain-text paste are left untouched.
+const RICH_HTML_TAG_RE = /<(h[1-6]|p|strong|b|em|i|u|s|del|ul|ol|li|a\s|img|table|thead|tbody|tr|td|th|blockquote|pre|code)[\s/>]/i;
+
 export function MarkdownEditor({ content, setContent, placeholder = "> Write your content here...", height = "400px" }: MarkdownEditorProps) {
   const { t } = useTranslation();
   const colorMode = useColorMode();
@@ -65,6 +70,21 @@ export function MarkdownEditor({ content, setContent, placeholder = "> Write you
       void insertImage(myfile, selection, showAlert).finally(() => {
         setUploading(false);
       });
+      return;
+    }
+
+    const html = clipboardData.getData("text/html");
+    if (html && RICH_HTML_TAG_RE.test(html)) {
+      const editor = editorRef.current;
+      if (!editor) return;
+      // Monaco's own paste listener already inserted the plain-text clipboard data
+      // by the time this handler runs; undo it before inserting the converted markdown.
+      editor.trigger(undefined, "undo", undefined);
+      const selection = editor.getSelection();
+      if (!selection) return;
+      const { default: html2md } = await import("html-to-md");
+      const markdown = html2md(html);
+      editor.executeEdits(undefined, [{ range: selection, text: markdown }]);
     }
   };
 

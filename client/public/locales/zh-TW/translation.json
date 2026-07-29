@@ -724,5 +724,7 @@
   "sort_latest": "最新",
   "sort_popular": "熱門",
   "total_tags": "共 {{count}} 個標籤",
+  "related_posts": "相關文章",
+  "no_related_posts": "目前沒有相關文章。",
   "anonymous": "匿名"
 }
