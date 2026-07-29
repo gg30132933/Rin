@@ -18,6 +18,9 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
       // gzip-size reporting spawns worker threads that silently die in restricted build sandboxes (e.g. Cloudflare Workers Builds)
       reportCompressedSize: false,
+      // esbuild's minifier spawns a native subprocess, which silently dies in Cloudflare's gVisor-sandboxed build container;
+      // terser runs in-process and avoids that failure mode
+      minify: 'terser',
     },
     plugins: [
       react(),
