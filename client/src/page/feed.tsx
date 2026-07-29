@@ -289,6 +289,10 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
                     onLoad={(e) => {
                       const iframe = e.target as HTMLIFrameElement;
                       if (iframe.contentWindow) {
+                        // Reset height before measuring: scrollHeight on the root element
+                        // is max(viewport height, content height), so measuring while the
+                        // iframe still has a tall height feeds back into ever-growing values.
+                        iframe.style.height = '0px';
                         iframe.style.height = iframe.contentWindow.document.documentElement.scrollHeight + 'px';
                       }
                     }}
