@@ -21,6 +21,15 @@ export default defineConfig(({ mode }) => {
       // esbuild's minifier spawns a native subprocess, which silently dies in Cloudflare's gVisor-sandboxed build container;
       // terser runs in-process and avoids that failure mode
       minify: 'terser',
+      rollupOptions: {
+        output: {
+          // unbounded parallel chunk-file writes hang/die silently in Cloudflare's build sandbox; serialize them
+          experimentalMinChunkSize: undefined,
+        },
+        // Rollup docs: throttles concurrent file reads/writes during bundle generation; low values avoid
+        // resource-exhaustion hangs in constrained CI sandboxes (e.g. Cloudflare Workers Builds)
+        maxParallelFileOps: 2,
+      },
     },
     plugins: [
       react(),
