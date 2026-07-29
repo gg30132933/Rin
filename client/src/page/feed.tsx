@@ -288,23 +288,18 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
                     style={{ minHeight: '800px' }}
                     onLoad={(e) => {
                       const iframe = e.target as HTMLIFrameElement;
-                      const win = iframe.contentWindow;
-                      if (!win) return;
-                      const resize = (tag: string) => {
-                        // Reset height before measuring: scrollHeight on the root element
-                        // is max(viewport height, content height), so measuring while the
-                        // iframe still has a tall height feeds back into ever-growing values.
-                        iframe.style.height = '0px';
-                        const sh = win.document.documentElement.scrollHeight;
-                        console.log('[iframe-resize]', tag, 'scrollHeight=', sh, 'clientWidth=', win.document.documentElement.clientWidth);
-                        iframe.style.height = sh + 'px';
-                      };
-                      // Measuring synchronously on load can catch layout mid-reflow
-                      // (e.g. before an @import'd webfont swaps in); defer past paint.
-                      resize('onLoad-sync');
-                      requestAnimationFrame(() => requestAnimationFrame(() => resize('raf-raf')));
-                      win.document.fonts?.ready.then(() => resize('fonts-ready'));
-                      setTimeout(() => resize('timeout-1s'), 1000);
+                      const body = iframe.contentDocument?.body;
+                      if (!body) return;
+                      // Track content's own box size instead of documentElement.scrollHeight:
+                      // scrollHeight is max(viewport height, content height), so it can
+                      // feed back into the iframe's own (still-settling) height and get
+                      // stuck too tall while the page's entrance animation is mid-flight.
+                      // ResizeObserver reports actual content size and keeps it in sync
+                      // afterwards too (late-loading webfonts, etc.)
+                      const ro = new ResizeObserver(([entry]) => {
+                        iframe.style.height = `${entry.contentRect.height}px`;
+                      });
+                      ro.observe(body);
                     }}
                   />
                 ) : (
