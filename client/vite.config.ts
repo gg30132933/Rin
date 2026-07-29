@@ -16,6 +16,8 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: '../dist/client',
       emptyOutDir: true,
+      // gzip-size reporting spawns worker threads that silently die in restricted build sandboxes (e.g. Cloudflare Workers Builds)
+      reportCompressedSize: false,
     },
     plugins: [
       react(),
